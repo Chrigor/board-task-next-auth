@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { FaTrash } from "react-icons/fa";
 import { FiShare2 } from "react-icons/fi";
+import { createTask } from "../actions/create-task.action";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -21,14 +22,15 @@ export default async function Dashboard() {
           <h1 className="text-slate-200 text-3xl font-bold w-full">
             Qual sua tarefa?
           </h1>
-          <form className="flex flex-col gap-2 w-full">
+          <form action={createTask} className="flex flex-col gap-2 w-full">
             <textarea
+              name="description"
               className="w-full resize-none rounded px-2 py-1 outline-none"
               rows={5}
               placeholder="Digite sua tarefa..."
             ></textarea>
             <div className="flex items-center gap-2">
-              <input id="public-task" type="checkbox" />
+              <input id="public-task" type="checkbox" name="public-task" />
               <label htmlFor="public-task" className="text-slate-200">
                 Deixar tarefa publica?
               </label>
