@@ -1,10 +1,22 @@
 "use server";
 
-export async function createTask(formData: FormData) {
-  const task = {
-    description: formData.get("description"),
-    public: formData.get("public-task"),
-  };
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../services/firebase";
+import { getServerSession } from "next-auth";
 
-  console.log(task);
+export async function createTask(formData: FormData) {
+  try {
+    const session = await getServerSession();
+
+    const task = {
+      public: formData.get("public-task") === "on" ? true : false,
+      description: formData.get("description"),
+      created: new Date(),
+      user: session?.user?.email
+    }
+    
+    await addDoc(collection(db, "tasks"), task)
+  } catch (error) {
+    console.log(error)
+  }
 }
