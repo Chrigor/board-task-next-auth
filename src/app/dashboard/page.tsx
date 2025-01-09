@@ -8,14 +8,13 @@ import { createTask } from "../actions/create-task.action";
 
 import {
   collection,
-  onSnapshot,
   orderBy,
   query,
   where,
   getDocs,
 } from "firebase/firestore";
 import { db } from "../services/firebase";
-import { revalidatePath } from "next/cache";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -34,7 +33,7 @@ export default async function Dashboard() {
   );
 
   const docs = await getDocs(myTasksQuery);
-  let myTasks = docs.docs.map((doc) => doc.data());
+  const myTasks = docs.docs.map((doc) => doc.data());
 
   return (
     <main className="w-full max-w-[1200px] mx-auto flex flex-col gap-8">
@@ -43,10 +42,7 @@ export default async function Dashboard() {
           <h1 className="text-slate-200 text-3xl font-bold w-full">
             Qual sua tarefa?
           </h1>
-          <form
-            action={createTask}
-            className="flex flex-col gap-2 w-full"
-          >
+          <form action={createTask} className="flex flex-col gap-2 w-full">
             <textarea
               name="description"
               className="w-full resize-none rounded px-2 py-1 outline-none"
@@ -89,7 +85,17 @@ export default async function Dashboard() {
                     </div>
                   )}
                   <div className="flex justify-between gap-2 items-center">
-                    <p className="text-md text-slate-900">{task.description}</p>
+                    {task.public ? (
+                      <Link href={`/task/${task.id}`}>
+                        <p className="text-md text-slate-900">
+                          {task.description}
+                        </p>
+                      </Link>
+                    ) : (
+                      <p className="text-md text-slate-900">
+                        {task.description}
+                      </p>
+                    )}
                     <button>
                       <FaTrash size={24} className="fill-red-800" />
                     </button>

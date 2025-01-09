@@ -1,15 +1,17 @@
 "use server";
 
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../services/firebase";
+import { randomUUID } from "crypto";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../services/firebase";
 
 export async function createTask(formData: FormData) {
   try {
     const session = await getServerSession();
 
     const task = {
+      id: randomUUID(),
       public: formData.get("public-task") === "on" ? true : false,
       description: formData.get("description"),
       created: new Date(),
