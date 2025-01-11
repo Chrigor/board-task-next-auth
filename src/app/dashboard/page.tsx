@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { FaTrash } from "react-icons/fa";
-import { FiShare2 } from "react-icons/fi";
+import Link from "next/link";
 
 import { createTask } from "../actions/create-task.action";
 
-import {
-  collection,
-  orderBy,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { collection, orderBy, query, where, getDocs } from "firebase/firestore";
 import { db } from "../services/firebase";
-import Link from "next/link";
+import { ShareButton } from "../_components/ShareButton";
+import { Task } from "../interfaces/task";
+import { deleteTask } from "../actions/delete-task.action";
+import { FaTrash } from "react-icons/fa";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -33,7 +29,12 @@ export default async function Dashboard() {
   );
 
   const docs = await getDocs(myTasksQuery);
-  const myTasks = docs.docs.map((doc) => doc.data());
+  const myTasks = docs.docs.map((doc) => {
+    return {
+      id: doc.id,
+      ...doc.data(),
+    };
+  }) as Task[];
 
   return (
     <main className="w-full max-w-[1200px] mx-auto flex flex-col gap-8">
@@ -72,18 +73,9 @@ export default async function Dashboard() {
         <ul className="flex flex-col gap-5">
           {myTasks.map((task) => {
             return (
-              <li className="w-full" key={task.description}>
+              <li className="w-full" key={task.id}>
                 <article className="w-full border flex flex-col gap-2 p-4 rounded bg-slate-200">
-                  {task.public && (
-                    <div className="flex gap-2">
-                      <label className="uppercase bg-cyan-600 text-slate-200 px-2 rounded">
-                        Publico
-                      </label>
-                      <button className="">
-                        <FiShare2 className="fill-cyan-600" />
-                      </button>
-                    </div>
-                  )}
+                  {task.public && <ShareButton taskId={task.id} />}
                   <div className="flex justify-between gap-2 items-center">
                     {task.public ? (
                       <Link href={`/task/${task.id}`}>
@@ -96,9 +88,12 @@ export default async function Dashboard() {
                         {task.description}
                       </p>
                     )}
-                    <button>
-                      <FaTrash size={24} className="fill-red-800" />
-                    </button>
+                    <form action={deleteTask}>
+                      <button type="submit">
+                        <FaTrash size={24} className="fill-red-800" />
+                      </button>
+                      <input type="hidden" name="id" value={task.id} />
+                    </form>
                   </div>
                 </article>
               </li>
