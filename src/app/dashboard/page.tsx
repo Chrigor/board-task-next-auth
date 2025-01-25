@@ -2,15 +2,17 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { FaTrash } from "react-icons/fa";
 
 import { createTask } from "../actions/create-task.action";
-
-import { collection, orderBy, query, where, getDocs } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { ShareButton } from "../_components/ShareButton";
-import { Task } from "../interfaces/task";
 import { deleteTask } from "../actions/delete-task.action";
-import { FaTrash } from "react-icons/fa";
+
+import { db } from "../services/firebase";
+import { collection, orderBy, query, where, getDocs } from "firebase/firestore";
+import { ShareButton } from "@/app/_components/ShareButton";
+import { TextArea } from "@/app/_components/TextArea";
+
+import { Task } from "../interfaces/task";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -44,12 +46,7 @@ export default async function Dashboard() {
             Qual sua tarefa?
           </h1>
           <form action={createTask} className="flex flex-col gap-2 w-full">
-            <textarea
-              name="description"
-              className="w-full resize-none rounded px-2 py-1 outline-none"
-              rows={5}
-              placeholder="Digite sua tarefa..."
-            ></textarea>
+            <TextArea name="description" placeholder="Digite sua tarefa ..."/>
             <div className="flex items-center gap-2">
               <input id="public-task" type="checkbox" name="public-task" />
               <label htmlFor="public-task" className="text-slate-200">
